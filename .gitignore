@@ -1,0 +1,11 @@
+# Generated route documents (regenerate on use)
+routes/
+# Saved sessions (local, may contain your own addresses)
+sessions/
+# Python
+__pycache__/
+*.pyc
+# Excel owner-locks / OS cruft
+~$*
+.DS_Store
+Thumbs.db

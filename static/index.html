@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CTS Route Planner</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<link rel="stylesheet" href="app.css"/>
+</head>
+<body>
+<div id="app">
+  <aside id="sidebar">
+    <h1>CTS Route Planner</h1>
+    <p class="sub">Drop pins, save stops, generate an optimized route, fuel cost &amp; delivery-time check.</p>
+
+    <div class="card">
+      <label>Session</label>
+      <div class="row">
+        <input id="sessionName" type="text" placeholder="session name"/>
+        <button id="saveSessionBtn">💾 Save</button>
+      </div>
+      <div class="row">
+        <button id="downloadSessionBtn" class="ghost sm">⬇ Download .json file</button>
+        <button id="loadFileBtn" class="ghost sm">📂 Load from file…</button>
+      </div>
+      <input id="loadFileInput" type="file" accept=".json,application/json" style="display:none"/>
+      <div class="row">
+        <select id="sessionSelect"><option value="">— load a saved session —</option></select>
+        <button id="loadSessionBtn">Load</button>
+      </div>
+      <p id="saveInfo" class="save-info hidden"></p>
+      <p class="hint">Save writes a file on the server <b>and</b> lets you download a <code>.json</code>. "Load from file…" opens a file picker. Also auto-saved in this browser between visits.</p>
+    </div>
+
+    <div class="card">
+      <label>Parameters</label>
+      <div class="row">
+        <div class="field"><span>Max delivery time (h)</span>
+          <input id="maxHours" type="number" step="0.5" min="0" value="7"/></div>
+        <div class="field"><span>Avg speed (km/h)</span>
+          <input id="speedKmh" type="number" step="1" min="0" value="35"/></div>
+      </div>
+      <div class="row">
+        <div class="field"><span>Default stop time (min)</span>
+          <input id="defaultService" type="number" step="1" min="0" value="15"/></div>
+        <div class="field end"><button id="applyServiceBtn" class="ghost sm">Apply to all stops</button></div>
+      </div>
+      <p class="hint">Speed 0 = use OSRM's own time estimate. "Apply to all" overwrites every stop's service time.</p>
+    </div>
+
+    <div class="card">
+      <label>Search a place</label>
+      <div class="row">
+        <input id="searchBox" type="text" placeholder="e.g. Tuen Mun Hospital"/>
+        <button id="searchBtn">Find</button>
+      </div>
+      <div id="searchResults"></div>
+    </div>
+
+    <div class="card">
+      <label>Add by coordinates</label>
+      <div class="row">
+        <input id="latInput" type="text" placeholder="lat (22.4044)"/>
+        <input id="lonInput" type="text" placeholder="lon (113.9687)"/>
+      </div>
+      <div class="row">
+        <input id="coordName" type="text" placeholder="label (optional)"/>
+        <button id="addCoordBtn">Add</button>
+      </div>
+      <p class="hint">Or just <b>click the map</b> to drop a pin.</p>
+    </div>
+
+    <div class="card">
+      <label>Fuel settings</label>
+      <div class="row">
+        <div class="field"><span>Price / L</span>
+          <input id="fuelPrice" type="number" step="0.01" value="19.50"/></div>
+        <div class="field"><span>Economy</span>
+          <input id="fuelEconomy" type="number" step="0.1" value="20.0"/></div>
+      </div>
+      <div class="row">
+        <select id="fuelUnit">
+          <option value="l_per_100km">L / 100 km</option>
+          <option value="km_per_l">km / L</option>
+        </select>
+      </div>
+      <div class="row checks">
+        <label class="chk"><input type="checkbox" id="optimize" checked/> Optimize order</label>
+        <label class="chk"><input type="checkbox" id="roundtrip"/> Round trip</label>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row between">
+        <label>Saved stops (<span id="stopCount">0</span>)</label>
+        <button id="clearBtn" class="ghost">Clear</button>
+      </div>
+      <p class="hint">First stop = start/depot. Edit the nickname; drag to reorder. Service = minutes at the stop.</p>
+      <ul id="stopList"></ul>
+    </div>
+
+    <button id="generateBtn" class="primary big">⚡ Generate Route &amp; Export XLSX</button>
+    <div id="status"></div>
+  </aside>
+
+  <main id="mapWrap">
+    <div id="map"></div>
+    <div id="resultsPanel" class="hidden">
+      <div class="results-head">
+        <h2>Route Result</h2>
+        <button id="closeResults" class="ghost">✕</button>
+      </div>
+      <div id="shiftBanner"></div>
+      <div id="totals"></div>
+      <div id="savedFiles"></div>
+      <h3>Per-stop breakdown</h3>
+      <div class="table-scroll"><table id="breakdownTable"></table></div>
+      <h3>Distance matrix (km)</h3>
+      <div class="table-scroll"><table id="matrixTable"></table></div>
+    </div>
+  </main>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="app.js"></script>
+</body>
+</html>
